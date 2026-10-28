@@ -33,22 +33,39 @@ public class LatencyController {
                 .description("Total API requests")
                 .register(registry);
 
-        this.latencyTimer = Timer.builder("api_request_duration")
+        this.latencyTimer = Timer.builder("springboot_latency_api_request_duration")
                 .description("API latency")
+                .publishPercentileHistogram()
                 .register(registry);
     }
 
     @GetMapping("/")
     public Map<String, String> hello() {
+                
+        return latencyTimer.record(() -> {
+
+            requestCounter.increment();
+
+            return Map.of(
+                    "service", "springboot-latency-api v0.3",
+                    "status", "success",
+                    "message", "Hello World"
+            );
+        });
+    }
+
+     @GetMapping("/pod")
+    public Map<String, String> pod() {
 
         return latencyTimer.record(() -> {
 
             requestCounter.increment();
 
             return Map.of(
-                    "service", "springboot-latency-api v0.2",
-                    "status", "success",
-                    "message", "Hello World"
+                    "hostname", (System.getenv("HOSTNAME")!= null) ? System.getenv("HOSTNAME") : "unknown",
+                    "pod_ip", (System.getenv("POD_IP")!= null) ? System.getenv("POD_IP") : "unknown",
+                    "pod_name", (System.getenv("POD_NAME")!= null) ? System.getenv("POD_NAME") : "unknown",                                        
+                    "message", "Successfully retrieved pod information"
             );
         });
     }

@@ -31,3 +31,7 @@ Springboot app to generate traffic for latency monitoring
     - docker stop springboot-latency-api
 * `remove`
     - docker rm -f springboot-latency-api
+
+## Prometheus
+* `actuator` 
+    - curl localhost:30040/actuator/prometheus | grep http_server_requests
